@@ -1,4 +1,4 @@
-package org.ashe;
+package org.ashe.auth;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

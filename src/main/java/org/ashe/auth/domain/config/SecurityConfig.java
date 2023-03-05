@@ -1,4 +1,4 @@
-package org.ashe.config;
+package org.ashe.auth.domain.config;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
