@@ -14,6 +14,8 @@ import org.springframework.security.config.annotation.web.configurers.oauth2.ser
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
@@ -74,12 +76,14 @@ public class SecurityConfig {
 
 		http
 			.authorizeHttpRequests(authorize -> authorize
-					.anyRequest().hasAnyAuthority()
-					.requestMatchers("/auth").authenticated()
+					// 放行
+					.requestMatchers("/register","/hello","/login","/logout").permitAll()
+					.anyRequest().authenticated()
 			)
 			// Form login handles the redirect to the login page from the
 			// authorization server filter chain
-			.formLogin(Customizer.withDefaults());
+				.formLogin().disable(); // 取消默认登录页面
+//			.formLogin(Customizer.withDefaults());
 
 		return http.build();
 	}
@@ -90,12 +94,10 @@ public class SecurityConfig {
 	 */
 	@Bean
 	public UserDetailsService userDetailsService() {
-		UserDetails userDetails = User.withDefaultPasswordEncoder()
-				.username("user")
-				.password("1234")
-				.roles("USER")
+		UserDetails userDetails = User.withUsername("user")
+				.password("{noop}1234")
+				.roles("user")
 				.build();
-
 		return new InMemoryUserDetailsManager(userDetails);
 	}
 
@@ -107,6 +109,7 @@ public class SecurityConfig {
 	public RegisteredClientRepository registeredClientRepository() {
 		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
 				.clientId("messaging-client")
+				// 要与user的密码一致？
 				.clientSecret("{noop}secret")
 				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
 				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
@@ -175,6 +178,22 @@ public class SecurityConfig {
 	public AuthorizationServerSettings authorizationServerSettings() {
 		return AuthorizationServerSettings.builder().build();
 	}
+
+	/**
+	 * 密码编译器
+	 */
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
+//	public static void main(String[] args) {
+//		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+//		String encode = bCryptPasswordEncoder.encode("123456");
+//		System.out.println(encode);
+//	}
+
+
 
 }
 

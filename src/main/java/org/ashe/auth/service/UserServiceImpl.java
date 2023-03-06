@@ -24,18 +24,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void register(RegisterDTO dto) {
-        // 参数校验
-        dto.verifyParams();
         // 判断账户是否已注册，若存在则响应提示
         User user = verifyAccount(dto);
         if (!ObjectUtils.isEmpty(user)) {
-            throw new BusinessException("该账户名已注册");
+            throw new BusinessException("该账户已被注册");
         }
         // 持久化
-        buildUser(dto);
+        registerUser(dto);
     }
 
-    private void buildUser(RegisterDTO dto) {
+    public void registerUser(RegisterDTO dto) {
         User user = new User();
         user.setAccount(dto.getAccount());
         user.setPassword(dto.getPassword());
@@ -49,10 +47,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private User verifyAccount(RegisterDTO dto) {
         // 获取注册类型枚举
         Register registerEnum = Register.valueOf(dto.getType());
-        return switch (registerEnum) {
-            case ACCOUNT -> this.getOne(new LambdaQueryWrapper<User>().eq(User::getAccount, dto.getAccount()));
+        switch (registerEnum) {
+            case ACCOUNT -> {
+                if (ObjectUtils.isEmpty(dto.getAccount()) || ObjectUtils.isEmpty(dto.getPassword())) {
+                    throw new BusinessException("账户或密码未填写");
+                }
+                return this.getOne(new LambdaQueryWrapper<User>().eq(User::getAccount, dto.getAccount()));
+            }
             case TEL, WECHAT -> throw new BusinessException("暂不支持的注册方式");
-        };
+        }
+        return null;
     }
 
     /**
