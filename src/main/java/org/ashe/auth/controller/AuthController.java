@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ashe.auth.domain.dto.LogoutDTO;
 import org.ashe.auth.domain.vo.resp.RespBody;
 import org.ashe.auth.service.UserService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

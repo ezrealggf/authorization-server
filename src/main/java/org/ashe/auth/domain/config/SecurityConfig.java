@@ -113,9 +113,8 @@ public class SecurityConfig {
 	@Bean
 	public RegisteredClientRepository registeredClientRepository() {
 		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-				.clientId("messaging-client")
-				// 要与user的密码一致？
-				.clientSecret("$2a$10$rta.mMfyRArua4HPKtwyY.QPgqQaf/NGe6EYb8n9zYiHv5gjS/5tC")
+				.clientId("client")
+				.clientSecret(new BCryptPasswordEncoder().encode("root"))
 				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
 				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
 				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
