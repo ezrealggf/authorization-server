@@ -1,6 +1,5 @@
 package org.ashe.auth.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.ashe.auth.domain.constants.Gender;
@@ -11,6 +10,7 @@ import org.ashe.auth.domain.dto.RegisterDTO;
 import org.ashe.auth.domain.model.User;
 import org.ashe.auth.domain.vo.exc.BusinessException;
 import org.ashe.auth.mapper.UserMapper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -36,7 +36,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public void registerUser(RegisterDTO dto) {
         User user = new User();
         user.setAccount(dto.getAccount());
-        user.setPassword(dto.getPassword());
+        // 密码加密
+        String encodePassword = new BCryptPasswordEncoder().encode(dto.getPassword());
+        user.setPassword(encodePassword);
         user.setGender(Gender.UN_KNOWN.getCode());
         this.save(user);
     }
@@ -44,6 +46,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     /**
      * 验证账户是否已注册
      */
+    @SuppressWarnings("all")
     private User verifyAccount(RegisterDTO dto) {
         // 获取注册类型枚举
         Register registerEnum = Register.valueOf(dto.getType());
@@ -52,11 +55,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 if (ObjectUtils.isEmpty(dto.getAccount()) || ObjectUtils.isEmpty(dto.getPassword())) {
                     throw new BusinessException("账户或密码未填写");
                 }
-                return this.getOne(new LambdaQueryWrapper<User>().eq(User::getAccount, dto.getAccount()));
+                return getUserByAccount(dto.getAccount());
             }
             case TEL, WECHAT -> throw new BusinessException("暂不支持的注册方式");
         }
         return null;
+    }
+
+    @Override
+    public User getUserByAccount(String account) {
+        return baseMapper.getUserByAccount(account);
     }
 
     /**
@@ -66,7 +74,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public void login(LoginDTO dto, HttpServletRequest request) {
         // 先判断是否已登录？
-
+        System.out.println("Here's Johnny!");
     }
 
     /**

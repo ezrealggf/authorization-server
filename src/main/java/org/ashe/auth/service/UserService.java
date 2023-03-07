@@ -13,4 +13,6 @@ public interface UserService extends IService<User> {
     void login(LoginDTO dto, HttpServletRequest request);
 
     void logout(LogoutDTO dto, HttpServletRequest request);
+
+    User getUserByAccount(String account);
 }

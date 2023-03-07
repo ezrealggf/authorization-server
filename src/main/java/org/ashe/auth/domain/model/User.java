@@ -22,7 +22,7 @@ public class User implements UserDetails, Serializable {
     /**
      * 主键
      */
-    private String id;
+    private String id; // mybatis-plus主键默认生成策略即雪花算法
 
     /**
      * 账户

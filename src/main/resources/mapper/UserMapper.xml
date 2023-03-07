@@ -2,4 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.ashe.auth.mapper.UserMapper">
     <!--namespace根据自己需要创建的的mapper的路径和名称填写-->
+
+    <!-- 根据账户查询用户 -->
+    <select id="getUserByAccount" resultType="org.ashe.auth.domain.model.User">
+        select id, account, password
+        from user
+        where account = #{account}
+    </select>
 </mapper>
